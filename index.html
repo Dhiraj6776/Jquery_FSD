@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TaskFlow Mobile</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div data-role="page" id="home" data-theme="a">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" class="tf-header">
+        <a href="#add-task" data-icon="plus" data-iconpos="notext" class="ui-btn-left tf-header-btn">Add</a>
+        <h1>TaskFlow</h1>
+        <a href="#stats" data-icon="bars" data-iconpos="notext" class="ui-btn-right tf-header-btn">Stats</a>
+    </div>
+
+    <div role="main" class="ui-content tf-content">
+
+        <!-- Summary Cards -->
+        <div class="tf-summary-row">
+            <div class="tf-summary-card tf-card-pending">
+                <span class="tf-summary-number" id="pending-count">0</span>
+                <span class="tf-summary-label">Pending</span>
+            </div>
+            <div class="tf-summary-card tf-card-progress">
+                <span class="tf-summary-number" id="progress-count">0</span>
+                <span class="tf-summary-label">In Progress</span>
+            </div>
+            <div class="tf-summary-card tf-card-done">
+                <span class="tf-summary-number" id="done-count">0</span>
+                <span class="tf-summary-label">Completed</span>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="tf-section-header">
+            <h2>Categories</h2>
+        </div>
+        <div class="tf-categories" id="category-pills">
+            <button class="tf-pill tf-pill-active" data-category="all">All</button>
+            <button class="tf-pill" data-category="work">🏢 Work</button>
+            <button class="tf-pill" data-category="personal">🏠 Personal</button>
+            <button class="tf-pill" data-category="health">💪 Health</button>
+            <button class="tf-pill" data-category="learning">📚 Learning</button>
+        </div>
+
+        <!-- Task List -->
+        <div class="tf-section-header">
+            <h2>My Tasks</h2>
+            <span class="tf-task-count" id="task-count-label">0 tasks</span>
+        </div>
+
+        <ul data-role="listview" data-inset="true" id="task-list" class="tf-task-list">
+            <!-- Tasks rendered by JS -->
+        </ul>
+
+        <!-- Quick Actions -->
+        <div class="tf-quick-actions">
+            <a href="#add-task" data-role="button" class="tf-btn-primary" data-transition="slideup">
+                ✚ Add New Task
+            </a>
+        </div>
+
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" class="tf-footer">
+        <div data-role="navbar" class="tf-navbar">
+            <ul>
+                <li><a href="#home" data-icon="home" class="ui-btn-active">Home</a></li>
+                <li><a href="#categories-page" data-icon="grid">Categories</a></li>
+                <li><a href="#add-task" data-icon="plus" data-transition="slideup">Add</a></li>
+                <li><a href="#stats" data-icon="info">Stats</a></li>
+                <li><a href="#profile" data-icon="user">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== ADD TASK PAGE ==================== -->
+<div data-role="page" id="add-task" data-theme="a">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" class="tf-header">
+        <a href="#home" data-icon="arrow-l" data-iconpos="notext" class="ui-btn-left tf-header-btn">Back</a>
+        <h1>New Task</h1>
+    </div>
+
+    <div role="main" class="ui-content tf-content">
+        <form id="task-form" class="tf-form">
+
+            <div class="tf-form-group">
+                <label for="task-title" class="tf-label">Task Title</label>
+                <input type="text" id="task-title" placeholder="e.g., Finish quarterly report" data-theme="a" class="tf-input">
+            </div>
+
+            <div class="tf-form-group">
+                <label for="task-desc" class="tf-label">Description</label>
+                <textarea id="task-desc" placeholder="Add details about your task..." data-theme="a" class="tf-input tf-textarea"></textarea>
+            </div>
+
+            <div class="tf-form-row">
+                <div class="tf-form-group tf-half">
+                    <label for="task-category" class="tf-label">Category</label>
+                    <select id="task-category" data-theme="a" class="tf-select">
+                        <option value="work">🏢 Work</option>
+                        <option value="personal">🏠 Personal</option>
+                        <option value="health">💪 Health</option>
+                        <option value="learning">📚 Learning</option>
+                    </select>
+                </div>
+                <div class="tf-form-group tf-half">
+                    <label for="task-priority" class="tf-label">Priority</label>
+                    <select id="task-priority" data-theme="a" class="tf-select">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tf-form-group">
+                <label for="task-due" class="tf-label">Due Date</label>
+                <input type="date" id="task-due" data-theme="a" class="tf-input">
+            </div>
+
+            <div class="tf-form-group">
+                <label for="task-status" class="tf-label">Status</label>
+                <select id="task-status" data-theme="a" class="tf-select">
+                    <option value="pending">⏳ Pending</option>
+                    <option value="in-progress">🔄 In Progress</option>
+                    <option value="completed">✅ Completed</option>
+                </select>
+            </div>
+
+            <button type="submit" class="tf-btn-primary tf-btn-submit">
+                💾 Save Task
+            </button>
+
+        </form>
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" class="tf-footer">
+        <div data-role="navbar" class="tf-navbar">
+            <ul>
+                <li><a href="#home" data-icon="home">Home</a></li>
+                <li><a href="#categories-page" data-icon="grid">Categories</a></li>
+                <li><a href="#add-task" data-icon="plus" class="ui-btn-active" data-transition="slideup">Add</a></li>
+                <li><a href="#stats" data-icon="info">Stats</a></li>
+                <li><a href="#profile" data-icon="user">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== TASK DETAIL PAGE ==================== -->
+<div data-role="page" id="task-detail" data-theme="a">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" class="tf-header">
+        <a href="#home" data-icon="arrow-l" data-iconpos="notext" class="ui-btn-left tf-header-btn">Back</a>
+        <h1>Task Details</h1>
+        <a href="#" id="delete-task-btn" data-icon="delete" data-iconpos="notext" class="ui-btn-right tf-header-btn">Delete</a>
+    </div>
+
+    <div role="main" class="ui-content tf-content">
+        <div class="tf-detail-card">
+            <div class="tf-detail-header">
+                <h2 id="detail-title" class="tf-detail-title">Task Title</h2>
+                <span id="detail-priority" class="tf-priority-badge">High</span>
+            </div>
+            <p id="detail-desc" class="tf-detail-desc">Task description goes here...</p>
+
+            <div class="tf-detail-meta">
+                <div class="tf-meta-item">
+                    <span class="tf-meta-label">Category</span>
+                    <span id="detail-category" class="tf-meta-value">Work</span>
+                </div>
+                <div class="tf-meta-item">
+                    <span class="tf-meta-label">Due Date</span>
+                    <span id="detail-due" class="tf-meta-value">Oct 20, 2026</span>
+                </div>
+                <div class="tf-meta-item">
+                    <span class="tf-meta-label">Status</span>
+                    <span id="detail-status" class="tf-meta-value">Pending</span>
+                </div>
+                <div class="tf-meta-item">
+                    <span class="tf-meta-label">Created</span>
+                    <span id="detail-created" class="tf-meta-value">Oct 18, 2026</span>
+                </div>
+            </div>
+
+            <div class="tf-detail-actions">
+                <button id="toggle-status-btn" class="tf-btn-secondary">
+                    ✅ Mark Complete
+                </button>
+                <button id="edit-task-btn" class="tf-btn-outline">
+                    ✏️ Edit Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" class="tf-footer">
+        <div data-role="navbar" class="tf-navbar">
+            <ul>
+                <li><a href="#home" data-icon="home">Home</a></li>
+                <li><a href="#categories-page" data-icon="grid">Categories</a></li>
+                <li><a href="#add-task" data-icon="plus" data-transition="slideup">Add</a></li>
+                <li><a href="#stats" data-icon="info">Stats</a></li>
+                <li><a href="#profile" data-icon="user">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== CATEGORIES PAGE ==================== -->
+<div data-role="page" id="categories-page" data-theme="a">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" class="tf-header">
+        <a href="#home" data-icon="arrow-l" data-iconpos="notext" class="ui-btn-left tf-header-btn">Back</a>
+        <h1>Categories</h1>
+    </div>
+
+    <div role="main" class="ui-content tf-content">
+        <ul data-role="listview" data-inset="true" id="category-list" class="tf-category-list">
+            <li data-icon="false">
+                <a href="#home" class="tf-category-item" data-filter-category="work">
+                    <span class="tf-cat-icon tf-cat-work">🏢</span>
+                    <div class="tf-cat-info">
+                        <h3>Work</h3>
+                        <p class="tf-cat-count" data-cat="work">0 tasks</p>
+                    </div>
+                    <span class="ui-li-count tf-count-badge" data-cat-count="work">0</span>
+                </a>
+            </li>
+            <li data-icon="false">
+                <a href="#home" class="tf-category-item" data-filter-category="personal">
+                    <span class="tf-cat-icon tf-cat-personal">🏠</span>
+                    <div class="tf-cat-info">
+                        <h3>Personal</h3>
+                        <p class="tf-cat-count" data-cat="personal">0 tasks</p>
+                    </div>
+                    <span class="ui-li-count tf-count-badge" data-cat-count="personal">0</span>
+                </a>
+            </li>
+            <li data-icon="false">
+                <a href="#home" class="tf-category-item" data-filter-category="health">
+                    <span class="tf-cat-icon tf-cat-health">💪</span>
+                    <div class="tf-cat-info">
+                        <h3>Health</h3>
+                        <p class="tf-cat-count" data-cat="health">0 tasks</p>
+                    </div>
+                    <span class="ui-li-count tf-count-badge" data-cat-count="health">0</span>
+                </a>
+            </li>
+            <li data-icon="false">
+                <a href="#home" class="tf-category-item" data-filter-category="learning">
+                    <span class="tf-cat-icon tf-cat-learning">📚</span>
+                    <div class="tf-cat-info">
+                        <h3>Learning</h3>
+                        <p class="tf-cat-count" data-cat="learning">0 tasks</p>
+                    </div>
+                    <span class="ui-li-count tf-count-badge" data-cat-count="learning">0</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" class="tf-footer">
+        <div data-role="navbar" class="tf-navbar">
+            <ul>
+                <li><a href="#home" data-icon="home">Home</a></li>
+                <li><a href="#categories-page" data-icon="grid" class="ui-btn-active">Categories</a></li>
+                <li><a href="#add-task" data-icon="plus" data-transition="slideup">Add</a></li>
+                <li><a href="#stats" data-icon="info">Stats</a></li>
+                <li><a href="#profile" data-icon="user">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== STATS PAGE ==================== -->
+<div data-role="page" id="stats" data-theme="a">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" class="tf-header">
+        <a href="#home" data-icon="arrow-l" data-iconpos="notext" class="ui-btn-left tf-header-btn">Back</a>
+        <h1>Statistics</h1>
+    </div>
+
+    <div role="main" class="ui-content tf-content">
+
+        <div class="tf-stats-hero">
+            <div class="tf-stats-ring">
+                <svg viewBox="0 0 120 120" class="tf-ring-svg">
+                    <circle cx="60" cy="60" r="52" class="tf-ring-bg"></circle>
+                    <circle cx="60" cy="60" r="52" class="tf-ring-fill" id="completion-ring"></circle>
+                </svg>
+                <div class="tf-ring-text">
+                    <span class="tf-ring-percent" id="completion-percent">0%</span>
+                    <span class="tf-ring-sub">Complete</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tf-stats-grid">
+            <div class="tf-stat-card">
+                <span class="tf-stat-icon">📋</span>
+                <span class="tf-stat-num" id="stat-total">0</span>
+                <span class="tf-stat-label">Total Tasks</span>
+            </div>
+            <div class="tf-stat-card">
+                <span class="tf-stat-icon">⏳</span>
+                <span class="tf-stat-num" id="stat-pending">0</span>
+                <span class="tf-stat-label">Pending</span>
+            </div>
+            <div class="tf-stat-card">
+                <span class="tf-stat-icon">🔄</span>
+                <span class="tf-stat-num" id="stat-progress">0</span>
+                <span class="tf-stat-label">In Progress</span>
+            </div>
+            <div class="tf-stat-card">
+                <span class="tf-stat-icon">✅</span>
+                <span class="tf-stat-num" id="stat-done">0</span>
+                <span class="tf-stat-label">Completed</span>
+            </div>
+        </div>
+
+        <div class="tf-section-header">
+            <h2>By Priority</h2>
+        </div>
+        <div class="tf-priority-bars">
+            <div class="tf-bar-item">
+                <span class="tf-bar-label">🔴 High</span>
+                <div class="tf-bar-track">
+                    <div class="tf-bar-fill tf-bar-high" id="bar-high" style="width: 0%"></div>
+                </div>
+                <span class="tf-bar-count" id="count-high">0</span>
+            </div>
+            <div class="tf-bar-item">
+                <span class="tf-bar-label">🟡 Medium</span>
+                <div class="tf-bar-track">
+                    <div class="tf-bar-fill tf-bar-medium" id="bar-medium" style="width: 0%"></div>
+                </div>
+                <span class="tf-bar-count" id="count-medium">0</span>
+            </div>
+            <div class="tf-bar-item">
+                <span class="tf-bar-label">🟢 Low</span>
+                <div class="tf-bar-track">
+                    <div class="tf-bar-fill tf-bar-low" id="bar-low" style="width: 0%"></div>
+                </div>
+                <span class="tf-bar-count" id="count-low">0</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" class="tf-footer">
+        <div data-role="navbar" class="tf-navbar">
+            <ul>
+                <li><a href="#home" data-icon="home">Home</a></li>
+                <li><a href="#categories-page" data-icon="grid">Categories</a></li>
+                <li><a href="#add-task" data-icon="plus" data-transition="slideup">Add</a></li>
+                <li><a href="#stats" data-icon="info" class="ui-btn-active">Stats</a></li>
+                <li><a href="#profile" data-icon="user">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== PROFILE PAGE ==================== -->
+<div data-role="page" id="profile" data-theme="a">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" class="tf-header">
+        <a href="#home" data-icon="arrow-l" data-iconpos="notext" class="ui-btn-left tf-header-btn">Back</a>
+        <h1>Profile</h1>
+    </div>
+
+    <div role="main" class="ui-content tf-content">
+
+        <div class="tf-profile-hero">
+            <div class="tf-avatar">
+                <span class="tf-avatar-text">DJ</span>
+            </div>
+            <h2 class="tf-profile-name">Dhiraj Jadhav</h2>
+            <p class="tf-profile-email">dhiraj@taskflow.app</p>
+        </div>
+
+        <div class="tf-profile-stats">
+            <div class="tf-pstat">
+                <span class="tf-pstat-num" id="profile-total">0</span>
+                <span class="tf-pstat-label">Tasks</span>
+            </div>
+            <div class="tf-pstat-divider"></div>
+            <div class="tf-pstat">
+                <span class="tf-pstat-num" id="profile-completed">0</span>
+                <span class="tf-pstat-label">Done</span>
+            </div>
+            <div class="tf-pstat-divider"></div>
+            <div class="tf-pstat">
+                <span class="tf-pstat-num" id="profile-streak">7</span>
+                <span class="tf-pstat-label">Day Streak</span>
+            </div>
+        </div>
+
+        <ul data-role="listview" data-inset="true" class="tf-settings-list">
+            <li data-icon="false"><a href="#">
+                <h3>🔔 Notifications</h3>
+                <p>Manage task reminders</p>
+            </a></li>
+            <li data-icon="false"><a href="#">
+                <h3>🎨 Appearance</h3>
+                <p>Theme & display settings</p>
+            </a></li>
+            <li data-icon="false"><a href="#">
+                <h3>☁️ Sync & Backup</h3>
+                <p>Cloud backup settings</p>
+            </a></li>
+            <li data-icon="false"><a href="#">
+                <h3>🗑️ Clear All Tasks</h3>
+                <p>Remove all tasks permanently</p>
+            </a></li>
+        </ul>
+
+        <div class="tf-app-info">
+            <p>TaskFlow Mobile v1.0</p>
+            <p>Built with jQuery Mobile</p>
+        </div>
+
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false" class="tf-footer">
+        <div data-role="navbar" class="tf-navbar">
+            <ul>
+                <li><a href="#home" data-icon="home">Home</a></li>
+                <li><a href="#categories-page" data-icon="grid">Categories</a></li>
+                <li><a href="#add-task" data-icon="plus" data-transition="slideup">Add</a></li>
+                <li><a href="#stats" data-icon="info">Stats</a></li>
+                <li><a href="#profile" data-icon="user" class="ui-btn-active">Profile</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
